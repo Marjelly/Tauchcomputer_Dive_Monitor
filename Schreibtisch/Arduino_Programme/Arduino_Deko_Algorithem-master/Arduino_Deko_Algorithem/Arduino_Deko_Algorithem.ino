@@ -1,5 +1,5 @@
 
-float b_1=0.5050
+float b_1=0.5050;
 float b_1b=0.5578;
 float b_2=0.6514;
 float b_3=0.7222;
@@ -26,7 +26,7 @@ float a_4=0.7562;
 float a_5=0.6670;
 float a_6=0.5933;
 float a_7=0.5282;
-float a_8=0.4701
+float a_8=0.4701;
 float a_9=0.4187;
 float a_10=0.3798;
 float a_11=0.3497;
@@ -124,7 +124,7 @@ void Dekogleichung2_3(){
  
 }
 void Nullzeit(){
-  for(int,e=0;e<numGewebe;e++){
+  for(int e=0;e<numGewebe;e++){
   
      x= -1*(((airp/b[e]+a[e]-Pigt0[e])/(Piig-Pigt0[e]))+1);
   
