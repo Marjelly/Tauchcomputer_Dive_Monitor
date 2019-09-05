@@ -56,30 +56,31 @@ float t12_16=635.00;
 
  
 float Piig=0;      //Einatemdruck
-float Pamb=0;//Umgebungsdruck
 float airp=1.01325;//Luftdruck
+float Pamb=airp;//Umgebungsdruck
 float PsH2o=0.063; //Sättigungsdampfdruck von Wasser
 float fig=78.08;   //Anteil des Inertgases im Atemgemisch in %
 float PigtE=0; //Inertgasdruck im Gewebe nach der Expositionszeit tE
 float Nz=999;
+float Nz_G=0;
 
-float Pigt0_1=Pamb;
-float Pigt0_1b=Pamb; 
-float Pigt0_2=Pamb;
-float Pigt0_3=Pamb;
-float Pigt0_4=Pamb;
-float Pigt0_5=Pamb; 
-float Pigt0_6=Pamb; 
-float Pigt0_7=Pamb; 
-float Pigt0_8=Pamb; 
-float Pigt0_9=Pamb; 
-float Pigt0_10=Pamb; 
-float Pigt0_11=Pamb; 
-float Pigt0_12=Pamb; 
-float Pigt0_13=Pamb; 
-float Pigt0_14=Pamb; 
-float Pigt0_15=Pamb;
-float Pigt0_16=Pamb; 
+float Pigt0_1=(airp-PsH2o)*(fig/100);
+float Pigt0_1b=(airp-PsH2o)*(fig/100);
+float Pigt0_2=(airp-PsH2o)*(fig/100);
+float Pigt0_3=(airp-PsH2o)*(fig/100);
+float Pigt0_4=(airp-PsH2o)*(fig/100);
+float Pigt0_5=(airp-PsH2o)*(fig/100);
+float Pigt0_6=(airp-PsH2o)*(fig/100);
+float Pigt0_7=(airp-PsH2o)*(fig/100);
+float Pigt0_8=(airp-PsH2o)*(fig/100);
+float Pigt0_9=(airp-PsH2o)*(fig/100);
+float Pigt0_10=(airp-PsH2o)*(fig/100);
+float Pigt0_11=(airp-PsH2o)*(fig/100);
+float Pigt0_12=(airp-PsH2o)*(fig/100);
+float Pigt0_13=(airp-PsH2o)*(fig/100);
+float Pigt0_14=(airp-PsH2o)*(fig/100);
+float Pigt0_15=(airp-PsH2o)*(fig/100);
+float Pigt0_16=(airp-PsH2o)*(fig/100);
  
 float Pigt0[]={ Pigt0_1 , Pigt0_1b , Pigt0_2 , Pigt0_3 , Pigt0_4 , Pigt0_5 , Pigt0_6 , Pigt0_7 , Pigt0_8 , Pigt0_9 , Pigt0_10 , Pigt0_11 , Pigt0_12 , Pigt0_13 , Pigt0_14 , Pigt0_15 , Pigt0_16 };  //Inertgasdruck im Gewebe zu beginn der Expositionszeit tE
 float tE=0;        //Einwirkzeit in min
@@ -88,32 +89,61 @@ int   numGewebe=17;
 float Pambtol=0;   //Von einem Gewebe noch Tolerierter Druck, bei dem noch keine Gasbasen auftreten
 float Pambtolmax=0;//Das Gewebe mit dem höchsten noch Tolerierter Druck, bei dem noch keine Gasbasen auftreten
 float x=0; //Wert bei der Nullzeitberechnung
+float y=0; //Wert bei der 2 Dekoberechnung
 float a[]={ a_1 , a_1b , a_2 , a_3 , a_4 , a_5 , a_6 , a_7 , a_8 , a_9 , a_10 , a_11 , a_12 , a_13 , a_14 , a_15 , a_16}; //Gewebefaktoren
 float b[]={ b_1 , b_1b , b_2 , b_3 , b_4 , b_5 , b_6 , b_7 , b_8 , b_9 , b_10 , b_11 , b_12 , b_13 , b_14 , b_15 , b_16}; //Gewebefaktoren 
 
 
 void setup() {
   Serial.begin(9600);
+  pinMode(A5,INPUT);
 }
    
 
 void loop() { 
+  
+   Pamb=(analogRead(A5)/400)+airp;
+   Dekogleichung1();
+   Dekogleichung2_3();
+   Nullzeitberechnung();
+   Serial.print("Pamb:");
+   Serial.println(Pamb);
+   Serial.print("Tauchzeit:");
+   Serial.println(tE);
    
+      
+   tE=tE+3;
+   
+   delay(2000);
 }
 void DekodatenAuslesen(){
 //Pamb=digitalRead(Drucksensor);
 }
 
 void Dekogleichung1(){  
-  Piig=(Pamb-PsH2o)*(100/fig);
+  Piig=(Pamb-PsH2o)*(fig/100);  //Funktioniert
 }
 
 void Dekogleichung2_3(){
   for(int i=0;i<numGewebe;i++){
+   
+    
   
-  PigtE=Pigt0[i]+(Piig-Pigt0[i])*(1-pow(2,(-1)*tE)/t12[i]);
-  
-  Pigt0[i]=PigtE;
+   PigtE= Pigt0[i] + ((Piig - Pigt0[i]) * (1 - pow(2, (-tE/t12[i])))); //Funktioniert 
+     
+   
+    //Serial.println(y);
+     
+    Pigt0[i]=PigtE;
+  /*if(i=3){
+    Serial.println(PigtE);
+    }
+    */
+    //Serial.println(t12[i]);
+    Serial.println(i);
+    Serial.println(Pigt0[i]);
+    
+   
   
   Pambtol=(PigtE-a[i])*b[i];
   
@@ -123,14 +153,18 @@ void Dekogleichung2_3(){
   }
  
 }
-void Nullzeit(){
+void Nullzeitberechnung(){
   for(int e=0;e<numGewebe;e++){
   
      x= -1*(((airp/b[e]+a[e]-Pigt0[e])/(Piig-Pigt0[e]))+1);
   
   if(x>0){
     
-    Nz= -1* log(x)/log(2)*t12[e];
+    Nz_G= -1* log(x)/log(2)*t12[e];
+
+    if(Nz_G<Nz){
+      Nz=Nz_G;
+      }
     }
     
     
