@@ -132,13 +132,13 @@ void Dekogleichung2_3(){
    PigtE= Pigt0[i] + ((Piig - Pigt0[i]) * (1 - pow(2, (-tE/t12[i])))); //Funktioniert 
      
    
-    //Serial.println(y);
+    
      
     Pigt0[i]=PigtE;
-  /*if(i=3){
-    Serial.println(PigtE);
-    }
-    */
+  
+    
+    
+    
     //Serial.println(t12[i]);
     Serial.println(i);
     Serial.println(Pigt0[i]);
