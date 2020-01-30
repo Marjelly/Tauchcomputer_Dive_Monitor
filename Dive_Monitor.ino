@@ -1,6 +1,6 @@
 #include <SPI.h>
 #include "Ucglib.h"
-Ucglib_ST7735_18x128x160_SWSPI ucg(/*sclk=*/ 12, /*data=*/ 11, /*cd=*/ 9, /*cs=*/ 10, /*reset=*/ 8);
+Ucglib_ST7735_18x128x160_SWSPI ucg(/*sclk=*/ 7, /*data=*/ 6, /*cd=*/ 9, /*cs=*/ 10, /*reset=*/ 8);
 
 int menuLineColor_1 =255;
 int menuLineColor_2 =255;
@@ -38,30 +38,34 @@ int maxDepthColor_1=0;
 int maxDepthColor_2=225;
 int maxDepthColor_3=255;
 
+int displayStatusPin=3;//on off
  
  
 
 void setup() {
+   digitalWrite(displayStatusPin,HIGH);
+   delay(2000);
   ucg.begin(UCG_FONT_MODE_SOLID);
   ucg.clearScreen();
-  ucg.setRotate90();
+  ucg.setRotate270();
   ucg.setFont(ucg_font_fub30_hr);
   ucg.setFont(ucg_font_lucasfont_alternate_hr);
   ucg.setFontPosBottom();
   ucg.setPrintPos(0,0);
-  
+  pinMode(displayStatusPin,OUTPUT);
 }
 
 void loop() {
+   
   drawMenuLine();
   drawDepth();
   drawDivetime();
   drawAscentSpeed();
-  //drawNoDecoTime();
+  drawNoDecoTime();
   //drawSafetyStop();
   drawTemperature();
   drawMaxDepth();
-  drawDecoStops();
+  //drawDecoStops();
 
 }
 void drawMenuLine(){
@@ -171,7 +175,7 @@ void drawDecoStops(){
   ucg.setColor(menuExplanationsColor_1,menuExplanationsColor_2,menuExplanationsColor_3);
   ucg.print("Deco Stops");
 
- 
+ //Dekostop 1
   ucg.setPrintPos(145,75);
   ucg.setColor(noDecoTimeColor_1,noDecoTimeColor_2,noDecoTimeColor_3);
   ucg.print("min");
@@ -192,43 +196,62 @@ void drawDecoStops(){
   ucg.setColor(noDecoTimeColor_1,noDecoTimeColor_2,noDecoTimeColor_3);
   ucg.print("m");
   
+  //Dekostop 2
+  ucg.setPrintPos(145,75);
+  ucg.setColor(noDecoTimeColor_1,noDecoTimeColor_2,noDecoTimeColor_3);
+  ucg.print("min");
   
+  ucg.setFont(ucg_font_7x14B_tr);
+  ucg.setPrintPos(94,90);
+  ucg.setColor(noDecoTimeColor_1,noDecoTimeColor_2,noDecoTimeColor_3);
+  ucg.print("12");
+
+  ucg.setPrintPos(118,78);
+  ucg.print(":");
+
+  ucg.setPrintPos(128,78);
+  ucg.print("95");
+  
+  ucg.setFont(ucg_font_lucasfont_alternate_hr);
+  ucg.setPrintPos(110,75);
+  ucg.setColor(noDecoTimeColor_1,noDecoTimeColor_2,noDecoTimeColor_3);
+  ucg.print("m");
 }
 
 void drawTemperature(){
   ucg.setFont(ucg_font_lucasfont_alternate_hr);
-  ucg.setPrintPos(0,110);
+  ucg.setPrintPos(93,110);
   ucg.setColor(menuExplanationsColor_1,menuExplanationsColor_2,menuExplanationsColor_3);
   ucg.print("Temperature");
 
  
-  ucg.setPrintPos(67,127);
+  ucg.setPrintPos(150,127);
   ucg.setColor(temperatureColor_1,temperatureColor_2,temperatureColor_3);
-  ucg.print("C");
+  ucg.print("c");
   
-  ucg.drawCircle(76,120, 2, UCG_DRAW_ALL);
+  ucg.drawCircle(157,120, 2, UCG_DRAW_ALL);
    
   
   ucg.setFont(ucg_font_courB18_tf);
-  ucg.setPrintPos(7,132);
+  ucg.setPrintPos(91,132);
   ucg.setColor(temperatureColor_1,temperatureColor_2,temperatureColor_3);
   ucg.print("13,3");
 }
 
 void drawMaxDepth(){
   ucg.setFont(ucg_font_lucasfont_alternate_hr);
-  ucg.setPrintPos(93,110);
+  ucg.setPrintPos(0,110);
   ucg.setColor(menuExplanationsColor_1,menuExplanationsColor_2,menuExplanationsColor_3);
   ucg.print("Max Depth");
 
  
-  ucg.setPrintPos(152,127);
+  ucg.setPrintPos(71,127);
   ucg.setColor(maxDepthColor_1,maxDepthColor_2,maxDepthColor_3);
   ucg.print("m");
 
   
   ucg.setFont(ucg_font_courB18_tf);
-  ucg.setPrintPos(93,132);
+  ucg.setPrintPos(8,132);
   ucg.setColor(maxDepthColor_1,maxDepthColor_2,maxDepthColor_3);
   ucg.print("15,5");
 }
